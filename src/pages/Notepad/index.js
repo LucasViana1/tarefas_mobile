@@ -13,7 +13,7 @@ const Home = () => {
       setNotes(data);
     }
     loadNotes();
-  }, []);
+  });
 
   return (
     <Container>

@@ -19,11 +19,23 @@ const addNote = () => {
   const [textTemp, setTextTemp] = useState('');
   const [controlLines, setControlLines] = useState(1);
 
+  const [notes, setNotes] = useState([]);
+  const name = 'Lucas';
+
   useEffect(() => {
-    // console.warn(text.length);
-    // console.warn(text);
-    // setControlLines(controlLines + 1);
-  });
+    async function loadNotes() {
+      const realm = await getRealm();
+      const data = realm.objects('Notes');
+      setNotes(data);
+    }
+    loadNotes();
+  }, []);
+
+  // useEffect(() => {
+  //   // console.warn(text.length);
+  //   // console.warn(getDate());
+  //   // setControlLines(controlLines + 1);
+  // });
 
   const getDate = () => {
     const date = new Date();
@@ -38,14 +50,17 @@ const addNote = () => {
 
   async function addNotes() {
     const insert = {
-      id: 5,
-      name: 'fernanda',
-      text: 'texto inserido por fernanda',
-      createdAt: '05/11/2018',
+      id: notes.length + 1, //qtd de registros locais +1
+      name: name, // nome autenticado no login
+      text: text,
+      createdAt: getDate(),
     };
     const realm = await getRealm();
     realm.write(() => {
       realm.create('Notes', insert);
+      //delete todos registros da tabela
+      // let allBooks = realm.objects('Notes');
+      // realm.delete(allBooks);
     });
   }
 
