@@ -14,19 +14,6 @@ const corSemFocus = '#808080';
 const iconSize = 30;
 
 const AppNavigator = createBottomTabNavigator({
-  Notepad: {
-    screen: Notepad,
-    navigationOptions: () => ({
-      title: 'Início',
-      tabBarIcon: ({focused}) => (
-        <Icon
-          name="home"
-          size={iconSize}
-          color={focused ? corFocus : corSemFocus}
-        />
-      ),
-    }),
-  },
   AddNote: {
     screen: AddNote,
     navigationOptions: () => ({
@@ -34,6 +21,19 @@ const AppNavigator = createBottomTabNavigator({
       tabBarIcon: ({focused}) => (
         <Icon
           name="plus-square"
+          size={iconSize}
+          color={focused ? corFocus : corSemFocus}
+        />
+      ),
+    }),
+  },
+  Notepad: {
+    screen: Notepad,
+    navigationOptions: () => ({
+      title: 'Início',
+      tabBarIcon: ({focused}) => (
+        <Icon
+          name="home"
           size={iconSize}
           color={focused ? corFocus : corSemFocus}
         />
