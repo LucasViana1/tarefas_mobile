@@ -1,11 +1,11 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
-import {createBottomTabNavigator} from 'react-navigation-tabs';
-import {createDrawerNavigator} from 'react-navigation-drawer';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+// import {createDrawerNavigator} from 'react-navigation-drawer';
 
-import Notepad from './pages/Notepad';
+import ViewNote from './pages/Notepad/ViewNote';
 import AddNote from './pages/Notepad/AddNote';
 import Calendar from './pages/Calendar';
 
@@ -13,24 +13,20 @@ const corFocus = '#303030';
 const corSemFocus = '#808080';
 const iconSize = 30;
 
-const AppNavigator = createBottomTabNavigator({
-  AddNote: {
-    screen: AddNote,
-    navigationOptions: () => ({
-      title: 'Adiciona',
-      tabBarIcon: ({focused}) => (
-        <Icon
-          name="plus-square"
-          size={iconSize}
-          color={focused ? corFocus : corSemFocus}
-        />
-      ),
-    }),
+const Notepad = () => createStackNavigator({
+  ViewNoteNavigator: {
+    screen: ViewNote,
   },
-  Notepad: {
-    screen: Notepad,
+  AddNoteNavigator: {
+    screen: AddNote,
+  },
+}, { headerMode: 'none' });
+
+const TabNavigator = createBottomTabNavigator({
+  NotepadPage: {
+    screen: Notepad(),
     navigationOptions: () => ({
-      title: 'Início',
+      title: 'Notas',
       tabBarIcon: ({focused}) => (
         <Icon
           name="home"
@@ -53,9 +49,35 @@ const AppNavigator = createBottomTabNavigator({
       ),
     }),
   },
+  // ViewNote: {
+  //   screen: ViewNote,
+  //   navigationOptions: () => ({
+  //     title: 'Início',
+  //     tabBarIcon: ({ focused }) => (
+  //       <Icon
+  //         name="home"
+  //         size={iconSize}
+  //         color={focused ? corFocus : corSemFocus}
+  //       />
+  //     ),
+  //   }),
+  // },
+  // AddNote: {
+  //   screen: AddNote,
+  //   navigationOptions: () => ({
+  //     title: 'Adiciona',
+  //     tabBarIcon: ({focused}) => (
+  //       <Icon
+  //         name="plus-square"
+  //         size={iconSize}
+  //         color={focused ? corFocus : corSemFocus}
+  //       />
+  //     ),
+  //   }),
+  // },
 });
 
-export default createAppContainer(AppNavigator);
+export default createAppContainer(TabNavigator);
 
 // const Routes = createAppContainer(
 //   createBottomTabNavigator(
