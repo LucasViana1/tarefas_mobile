@@ -43,7 +43,7 @@ export const Time = styled.Text`
   font-size: 18px;
   color: #525252;
 `;
-export const PanelDescription = styled.View`
+export const PanelDescription = styled.TouchableOpacity`
   display: flex;
   align-items: center;
   margin-top: 10px;
@@ -55,9 +55,9 @@ export const PanelDescription = styled.View`
   border-top-width: 1px;
   border-top-color: gray;
 `;
-export const Description = styled.Text.attrs({
-  numberOfLines: 1,
-})`
+export const Description = styled.Text.attrs((props) => ({
+  numberOfLines: props.viewAll,
+}))`
   font-size: 20px;
   margin-vertical: 24px;
 `;

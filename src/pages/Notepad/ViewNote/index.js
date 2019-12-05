@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 import { 
@@ -20,6 +20,7 @@ import Head from '../../../components/Header';
 
 const ViewNote = ({ navigation }) => {
   const [notes, setNotes] = useState([]);
+  const [numLines, setNumLines] = useState(2);
   async function loadNotes() {
     // await AsyncStorage.removeItem('notes');
     // await AsyncStorage.removeItem('contNotes');
@@ -66,15 +67,47 @@ const ViewNote = ({ navigation }) => {
               <ButtonIcon>
                 <Icon name="edit" size={26} />
               </ButtonIcon>
-              <ButtonIcon>
+              <ButtonIcon onPress={ async () => {
+                const contIdNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
+                let allNotes = notes;
+                // console.warn(allNotes)
+                Alert.alert(
+                  'Atenção!',
+                  'Tem certeza que deseja apagar essa nota?',
+                  [
+                    {text: 'SIM', onPress: async () => {
+                      for (let i = 0; i < contIdNotes; i++) {
+                        if (allNotes[i].id === item.id) {
+                          // console.warn(allNotes[i])
+                          // console.warn(i)
+                          allNotes.splice(i, 1);
+                          // eslint-disable-next-line no-await-in-loop
+                          await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
+                          break;
+                        }
+                      }
+                    }},
+                    {text: 'NÃO', onPress: () => {}}
+                  ],
+                  {cancelable: false},
+                );
+                
+              }}>
                 <Icon name="trash" size={26} />
               </ButtonIcon>
               <ButtonIcon>
                 <Icon name="signal" size={26} />
               </ButtonIcon>
             </PanelTime>
-            <PanelDescription>
-              <Description>{item.text}</Description>
+            <PanelDescription onPress={() => {
+              if(numLines === 0){
+                setNumLines(2);
+              }
+              else{
+                setNumLines(0);
+              }
+            }}>
+              <Description viewAll={numLines}>{item.text}</Description>
             </PanelDescription>
             <PanelButtonType>
               <TitleButtonType>MUDANÇA DE PRIORIDADE: </TitleButtonType>
