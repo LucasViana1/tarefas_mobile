@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-max-props-per-line */
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 import { 
@@ -17,17 +18,19 @@ import {
 } from './styles';
 
 import Head from '../../../components/Header';
+const screenWidth = Math.round(Dimensions.get('window').width);
+const screenHeight = Math.round(Dimensions.get('window').height);
 
 const ViewNote = ({ navigation }) => {
   const [notes, setNotes] = useState([]);
   const [numLines, setNumLines] = useState(2);
+  const [loadSpinner, setLoadSpinner] = useState(false);
   async function loadNotes() {
     // await AsyncStorage.removeItem('notes');
     // await AsyncStorage.removeItem('contNotes');
     let allNotes = JSON.parse(await AsyncStorage.getItem('notes'));
     if (allNotes === null) allNotes = [];
     setNotes(allNotes);
-    // console.warn(allNotes);
   }
   async function changeColor(newType, id) {
     let allNotes = notes;
@@ -43,9 +46,46 @@ const ViewNote = ({ navigation }) => {
   useEffect(() => {
     loadNotes();
   });
+  function spinner(){
+    if(loadSpinner){
+      return <ActivityIndicator size={110} animating={true}
+          style={{
+            flex: 1, 
+            position: 'absolute', 
+            backgroundColor: 'rgba(10,23,55,0.2)', 
+            height: screenHeight,
+            width: screenWidth,
+            zIndex: 1,
+          }}
+        />
+    }
+  }
+  async function removeNote(id){
+    const contIdNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
+    let allNotes = notes;
+    Alert.alert(
+      'Atenção!',
+      'Tem certeza que deseja apagar essa nota?',
+      [
+        {text: 'SIM', onPress: async () => {
+          for (let i = 0; i < contIdNotes; i++) {
+            if (allNotes[i].id === id) {
+              allNotes.splice(i, 1);
+              await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
+              break;
+            }
+          }
+        }},
+        {text: 'NÃO', onPress: () => {}}
+      ],
+      {cancelable: false},
+    );
+  }
+
   return (
     <Container>
       <Head />
+      {spinner()}
       <FlatList
         data={notes}
         renderItem={({ item }) => (
@@ -62,62 +102,29 @@ const ViewNote = ({ navigation }) => {
             }}
           >
             <PanelTime>
-              {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
               <Time>{item.createdAt} às {item.time}</Time>
               <ButtonIcon>
                 <Icon name="edit" size={26} />
               </ButtonIcon>
-              <ButtonIcon onPress={ async () => {
-                const contIdNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
-                let allNotes = notes;
-                // console.warn(allNotes)
-                Alert.alert(
-                  'Atenção!',
-                  'Tem certeza que deseja apagar essa nota?',
-                  [
-                    {text: 'SIM', onPress: async () => {
-                      for (let i = 0; i < contIdNotes; i++) {
-                        if (allNotes[i].id === item.id) {
-                          // console.warn(allNotes[i])
-                          // console.warn(i)
-                          allNotes.splice(i, 1);
-                          // eslint-disable-next-line no-await-in-loop
-                          await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
-                          break;
-                        }
-                      }
-                    }},
-                    {text: 'NÃO', onPress: () => {}}
-                  ],
-                  {cancelable: false},
-                );
-                
-              }}>
+              <ButtonIcon onPress={ async () => removeNote(item.id)}>
                 <Icon name="trash" size={26} />
               </ButtonIcon>
               <ButtonIcon>
                 <Icon name="signal" size={26} />
               </ButtonIcon>
             </PanelTime>
-            <PanelDescription onPress={() => {
-              if(numLines === 0){
-                setNumLines(2);
-              }
-              else{
-                setNumLines(0);
-              }
-            }}>
+            <PanelDescription onPress={() => numLines === 0 ? setNumLines(2) : setNumLines(0) }>
               <Description viewAll={numLines}>{item.text}</Description>
             </PanelDescription>
             <PanelButtonType>
               <TitleButtonType>MUDANÇA DE PRIORIDADE: </TitleButtonType>
-              <Button onPress={() => changeColor('Urgente', item.id)} style={{ backgroundColor: 'red' }}>
+              <Button onPress={() => changeColor('Urgente', item.id)} color='red'>
                 <LabelButton>{' '}</LabelButton>
               </Button>
-              <Button onPress={() => changeColor('Atenção', item.id)} style={{ backgroundColor: 'yellow' }}>
+              <Button onPress={() => changeColor('Atenção', item.id)} color='yellow'>
                 <LabelButton>{' '}</LabelButton>
               </Button>
-              <Button onPress={() => changeColor('Comum', item.id)} style={{ backgroundColor: 'green' }}>
+              <Button onPress={() => changeColor('Comum', item.id)} color='green'>
                 <LabelButton>{' '}</LabelButton>
               </Button>
             </PanelButtonType>
@@ -126,7 +133,9 @@ const ViewNote = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
       />
       <TouchableOpacity style={{alignItems: 'center'}} onPress={ () =>{
+        setLoadSpinner(true);
         navigation.navigate('AddNoteNavigator')
+        setLoadSpinner(false);
       }}>
         <Text style={{fontSize: 50, fontWeight: 'bold'}}>+</Text>
       </TouchableOpacity>

@@ -56,13 +56,8 @@ const AddNote = ({ navigation }) => {
     const notesObjTemp = JSON.parse(await AsyncStorage.getItem('notes')) || []; // pega os valores armazenados atualmente
     notesObjTemp.push(ins); // insere novo registro
     await AsyncStorage.setItem('notes', JSON.stringify(notesObjTemp)); // colocar o total + novo registro no asyncstorage
-    // aumenta contador de qtd de notas salvas
-    contNotes++;
+    contNotes++; // aumenta contador de qtd de notas salvas
     await AsyncStorage.setItem('contNotes', contNotes.toString());
-    // console.warn(await AsyncStorage.getItem('notes'));
-    // await AsyncStorage.removeItem('notes');
-    // await AsyncStorage.removeItem('contNotes');
-    // console.warn('ok');
   }
 
   return (
