@@ -16,6 +16,7 @@ import {
   TitleButtonType,
   ButtonIcon,
 } from './styles';
+import {useSelector,useDispatch} from 'react-redux';
 
 import Head from '../../../components/Header';
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -25,6 +26,17 @@ const ViewNote = ({ navigation }) => {
   const [notes, setNotes] = useState([]);
   const [numLines, setNumLines] = useState(2);
   const [loadSpinner, setLoadSpinner] = useState(false);
+
+  const login = useSelector(state => state.user.login);
+  // const teste = useSelector(state => state.addOrEdit.operation);
+  const dispatch = useDispatch();
+
+  function addOrEdit(op) {
+    // a action poderia ser separado, retornando um objeto
+    const actionaddOrEdit = op === 'edit' ? 
+      {type: 'ALTER_ADD_OR_EDIT', textButton: 'EDITAR'} : {type: 'ALTER_ADD_OR_EDIT', textButton: 'ADICIONAR'};
+    dispatch(actionaddOrEdit);
+  }
   async function loadNotes() {
     // await AsyncStorage.removeItem('notes');
     // await AsyncStorage.removeItem('contNotes');
@@ -36,15 +48,18 @@ const ViewNote = ({ navigation }) => {
     let allNotes = notes;
     for (let i = 0; i < allNotes.length; i++) {
       if (allNotes[i].id === id) {
-        allNotes[i].typeNote = newType;
+        allNotes[i].typeNote = newType;   
         break;
       }
     }
     await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
     // setNotes(allNotes);
+    
   }
   useEffect(() => {
+    setLoadSpinner(true);
     loadNotes();
+    setLoadSpinner(false);
   });
   function spinner(){
     if(loadSpinner){
@@ -86,6 +101,7 @@ const ViewNote = ({ navigation }) => {
     <Container>
       <Head />
       {spinner()}
+      <Text>{login}</Text>
       <FlatList
         data={notes}
         renderItem={({ item }) => (
@@ -101,9 +117,13 @@ const ViewNote = ({ navigation }) => {
               elevation: 3,
             }}
           >
+            
             <PanelTime>
               <Time>{item.createdAt} às {item.time}</Time>
-              <ButtonIcon>
+              <ButtonIcon onPress={ () => {
+                addOrEdit('edit');
+                navigation.navigate('AddNoteNavigator')
+              }}>
                 <Icon name="edit" size={26} />
               </ButtonIcon>
               <ButtonIcon onPress={ async () => removeNote(item.id)}>
@@ -134,6 +154,7 @@ const ViewNote = ({ navigation }) => {
       />
       <TouchableOpacity style={{alignItems: 'center'}} onPress={ () =>{
         setLoadSpinner(true);
+        addOrEdit('add');
         navigation.navigate('AddNoteNavigator')
         setLoadSpinner(false);
       }}>

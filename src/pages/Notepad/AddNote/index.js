@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Text } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 // import Icon from 'react-native-vector-icons/FontAwesome';
 import {
@@ -13,6 +13,7 @@ import {
   Select,
   LabelSelect,
 } from './styles';
+import {useSelector} from 'react-redux';
 // const screenWidth = Math.round(Dimensions.get('window').width);
 // const screenHeight = Math.round(Dimensions.get('window').height);
 
@@ -23,7 +24,9 @@ const AddNote = ({ navigation }) => {
   const [textTemp, setTextTemp] = useState('');
   const [controlLines, setControlLines] = useState(1);
   const [typeNote, setTypeNote] = useState('Comum');
-  const name = 'Lucas';
+
+  const name = useSelector(state => state.user.login);
+  const textButton = useSelector(state => state.addOrEdit.operation);
 
   const getDate = () => {
     const date = new Date();
@@ -63,6 +66,7 @@ const AddNote = ({ navigation }) => {
   return (
     <Container>
       <Head />
+      <Text>{name}</Text>
       <Body>
         <TextArea
           valueSelect={typeNote}
@@ -99,7 +103,7 @@ const AddNote = ({ navigation }) => {
               {cancelable: false},
             );
           }}>
-            <LabelButton>ADICIONAR</LabelButton>
+            <LabelButton>{textButton}</LabelButton>
           </Button>
         </PanelButton>
       </Body>
