@@ -1,18 +1,14 @@
 import React from 'react';
-// import {View} from 'react-native';
-// import Home from './pages/Home';
-// import Calendar from './pages/Calendar';
 import Routes from './routes';
 
-const App = () => {
-  // return <Router />;
-  return (
-    // <View>
-    //   <Home />
-    //   <Calendar />
-    // </View>
+import {Provider} from 'react-redux';
+import store from './redux/store';
 
-    <Routes />
+const App = () => {
+  return (
+    <Provider store={store}>
+      <Routes />
+    </Provider>
   );
 };
 
