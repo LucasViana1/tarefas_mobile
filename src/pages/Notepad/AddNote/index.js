@@ -27,6 +27,33 @@ const AddNote = ({ navigation }) => {
 
   const name = useSelector(state => state.user.login);
   const textButton = useSelector(state => state.addOrEdit.operation);
+  const id = useSelector(state => state.addOrEdit.id);
+
+  useEffect(() => {
+    const loadTextValue = async () =>{
+      // let content = '';
+      if(id !== 0){
+        let allNotes = JSON.parse(await AsyncStorage.getItem('notes'));
+        const contIdNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
+        for (let i = 0; i < contIdNotes; i++) {
+          // console.log('INICIO TESTE: ')
+          // console.log(allNotes[i].text)            
+          // console.log(id)            
+          if (allNotes[i].id === id) {
+            // allNotes.splice(i, 1);
+            // content = allNotes[i].text;
+            setTextTemp(allNotes[i].text);
+            // await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
+            break;
+          }
+        }
+      }
+      // console.log(content)
+      // return content;
+    }
+    // setTextTemp(loadTextValue);
+    loadTextValue()
+  }, [id]);
 
   const getDate = () => {
     const date = new Date();
