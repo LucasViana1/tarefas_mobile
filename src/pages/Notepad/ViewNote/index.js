@@ -31,11 +31,15 @@ const ViewNote = ({ navigation }) => {
   // const teste = useSelector(state => state.addOrEdit.operation);
   const dispatch = useDispatch();
 
-  function addOrEdit(op) {
+  function addOrEdit(id, option) {
     // a action poderia ser separado, retornando um objeto
-    const actionaddOrEdit = op === 'edit' ? 
-      {type: 'ALTER_ADD_OR_EDIT', textButton: 'EDITAR'} : {type: 'ALTER_ADD_OR_EDIT', textButton: 'ADICIONAR'};
-    dispatch(actionaddOrEdit);
+    const actionAddOrEdit = () =>{
+      if(option === 'edit')
+        return {type: 'ALTER_ADD_OR_EDIT', textButton: 'EDITAR', id}
+      else 
+        return {type: 'ALTER_ADD_OR_EDIT', textButton: 'ADICIONAR', id}
+    }
+    dispatch(actionAddOrEdit());
   }
   async function loadNotes() {
     // await AsyncStorage.removeItem('notes');
@@ -121,7 +125,7 @@ const ViewNote = ({ navigation }) => {
             <PanelTime>
               <Time>{item.createdAt} às {item.time}</Time>
               <ButtonIcon onPress={ () => {
-                addOrEdit('edit');
+                addOrEdit(item.id, 'edit');
                 navigation.navigate('AddNoteNavigator')
               }}>
                 <Icon name="edit" size={26} />
@@ -154,7 +158,7 @@ const ViewNote = ({ navigation }) => {
       />
       <TouchableOpacity style={{alignItems: 'center'}} onPress={ () =>{
         setLoadSpinner(true);
-        addOrEdit('add');
+        addOrEdit(0, 'add');
         navigation.navigate('AddNoteNavigator')
         setLoadSpinner(false);
       }}>

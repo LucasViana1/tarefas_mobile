@@ -71,6 +71,8 @@ export const Button = styled.TouchableOpacity`
   margin-left: 4px;
   padding: 9px;
   border-radius: 40px;
+  border-width: 0.5px;
+  border-color: #d1d1d1;
   background-color: ${(props) => props.color};
 `;
 export const ButtonIcon = styled.TouchableOpacity`
