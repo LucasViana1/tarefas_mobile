@@ -15,6 +15,9 @@ import {
   LabelButton,
   TitleButtonType,
   ButtonIcon,
+  LabelButtonNew,
+  ViewButtonNew,
+  ButtonNew,
 } from './styles';
 import {useSelector,useDispatch} from 'react-redux';
 
@@ -23,14 +26,14 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
 const ViewNote = ({ navigation }) => {
-  const [notes, setNotes] = useState([]);
-  const [numLines, setNumLines] = useState(2);
-  const [loadSpinner, setLoadSpinner] = useState(false);
+  const [notes, setNotes] = useState([]); // lista de notas
+  const [numLines, setNumLines] = useState(2); // limite linhas exibidas no card
+  const [loadSpinner, setLoadSpinner] = useState(false); // ativa/desativa spinner (em testes)
 
-  const login = useSelector(state => state.user.login);
-  // const teste = useSelector(state => state.addOrEdit.operation);
-  const dispatch = useDispatch();
+  const login = useSelector(state => state.user.login);// nome user
+  const dispatch = useDispatch(); // dispara açãoes ao redux
 
+  // atividade de edição ou adicionar nota
   function addOrEdit(id, option) {
     // a action poderia ser separado, retornando um objeto
     const actionAddOrEdit = () =>{
@@ -41,13 +44,6 @@ const ViewNote = ({ navigation }) => {
     }
     dispatch(actionAddOrEdit());
   }
-  async function loadNotes() {
-    // await AsyncStorage.removeItem('notes');
-    // await AsyncStorage.removeItem('contNotes');
-    let allNotes = JSON.parse(await AsyncStorage.getItem('notes'));
-    if (allNotes === null) allNotes = [];
-    setNotes(allNotes);
-  }
   async function changeColor(newType, id) {
     let allNotes = notes;
     for (let i = 0; i < allNotes.length; i++) {
@@ -57,14 +53,30 @@ const ViewNote = ({ navigation }) => {
       }
     }
     await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
-    // setNotes(allNotes);
-    
+  }
+  async function loadNotes() {
+    // await AsyncStorage.removeItem('notes');
+    // await AsyncStorage.removeItem('contNotes');
+    let allNotes = JSON.parse(await AsyncStorage.getItem('notes'));
+    if (allNotes === null) allNotes = [];
+    setNotes(allNotes);
   }
   useEffect(() => {
     setLoadSpinner(true);
     loadNotes();
     setLoadSpinner(false);
   });
+  function dateTimeEdit(date, time){
+    let resp = '';
+    if(date === '' || date === null || time === '' || time === null){
+      resp = `sem registro.`;
+    }
+    else {
+      resp = `${date} às ${time}.`;
+    }
+    
+    return resp;
+  }
   function spinner(){
     if(loadSpinner){
       return <ActivityIndicator size={110} animating={true}
@@ -120,10 +132,12 @@ const ViewNote = ({ navigation }) => {
               shadowRadius: 2.22,
               elevation: 3,
             }}
-          >
-            
+          >      
             <PanelTime>
-              <Time>{item.createdAt} às {item.time}</Time>
+              <View>
+                <Time>Criado: {item.creationDate} às {item.creationTime}.</Time>
+                <Time>Editado: {dateTimeEdit(item.updateDate,item.updateTime)}</Time>              
+              </View>
               <ButtonIcon onPress={ () => {
                 addOrEdit(item.id, 'edit');
                 navigation.navigate('AddNoteNavigator')
@@ -156,14 +170,15 @@ const ViewNote = ({ navigation }) => {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
-      <TouchableOpacity style={{alignItems: 'center'}} onPress={ () =>{
-        setLoadSpinner(true);
-        addOrEdit(0, 'add');
-        navigation.navigate('AddNoteNavigator')
-        setLoadSpinner(false);
-      }}>
-        <Text style={{fontSize: 50, fontWeight: 'bold'}}>+</Text>
-      </TouchableOpacity>
+      <ButtonNew
+        onPress={ () =>{
+          setLoadSpinner(true);
+          addOrEdit(0, 'add');
+          navigation.navigate('AddNoteNavigator')
+          setLoadSpinner(false);
+        }}>
+          <LabelButtonNew>+</LabelButtonNew>
+      </ButtonNew>
     </Container>
   );
 };

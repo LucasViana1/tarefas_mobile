@@ -40,7 +40,7 @@ export const PanelTime = styled.View`
 `;
 export const Time = styled.Text`
   margin-left: 3px;
-  font-size: 18px;
+  font-size: 13.5px;
   color: #525252;
 `;
 export const PanelDescription = styled.TouchableOpacity`
@@ -80,7 +80,22 @@ export const ButtonIcon = styled.TouchableOpacity`
 `;
 export const TitleButtonType = styled.Text`
   flex: 4;
-  color: #454545
+  color: #454545;
+  align-items: center;
+  justify-content: center;
+  font-family: Roboto-Light;
+`;
+export const LabelButtonNew = styled.Text`
+  font-size: 50px;
+  font-family: Roboto-Black;
+`;
+// export const ViewButtonNew = styled.View`
+//   padding-horizontal: 4px; 
+//   padding-vertical: 2px;
+// `;
+export const ButtonNew = styled.TouchableOpacity`
+  align-items: center;
+  justify-content: center; 
 `;
 export const LabelButton = styled.Text`
   

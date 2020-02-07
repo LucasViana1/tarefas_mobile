@@ -1,8 +1,7 @@
-import React from 'react';
+ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Head } from './styles';
-// import getRealm from '../../service/realm';
 
 const Header = () => {
   return (

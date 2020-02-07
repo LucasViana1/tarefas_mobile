@@ -20,38 +20,29 @@ import {useSelector} from 'react-redux';
 import Head from '../../../components/Header';
 
 const AddNote = ({ navigation }) => {
-  const [text, setText] = useState('');
-  const [textTemp, setTextTemp] = useState('');
-  const [controlLines, setControlLines] = useState(1);
-  const [typeNote, setTypeNote] = useState('Comum');
+  const [text, setText] = useState(''); // TALVEZ REMOVER
+  const [textTemp, setTextTemp] = useState(''); // texto temporario do text area
+  const [controlLines, setControlLines] = useState(1);// indicador de numero de linhas no text area
+  const [typeNote, setTypeNote] = useState('Comum'); // tipo da nota
 
-  const name = useSelector(state => state.user.login);
-  const textButton = useSelector(state => state.addOrEdit.operation);
-  const id = useSelector(state => state.addOrEdit.id);
+  const name = useSelector(state => state.user.login); // nome user
+  const textButton = useSelector(state => state.addOrEdit.operation); // label botão (adicionar/editar)
+  const id = useSelector(state => state.addOrEdit.id); // id da nota
 
   useEffect(() => {
+    // verifica se a nota ja existe, nesse caso setando seu conteudo no text area
     const loadTextValue = async () =>{
-      // let content = '';
       if(id !== 0){
         let allNotes = JSON.parse(await AsyncStorage.getItem('notes'));
         const contIdNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
-        for (let i = 0; i < contIdNotes; i++) {
-          // console.log('INICIO TESTE: ')
-          // console.log(allNotes[i].text)            
-          // console.log(id)            
+        for (let i = 0; i < contIdNotes; i++) {           
           if (allNotes[i].id === id) {
-            // allNotes.splice(i, 1);
-            // content = allNotes[i].text;
             setTextTemp(allNotes[i].text);
-            // await AsyncStorage.setItem('notes', JSON.stringify(allNotes));
             break;
           }
         }
       }
-      // console.log(content)
-      // return content;
     }
-    // setTextTemp(loadTextValue);
     loadTextValue()
   }, [id]);
 
@@ -70,24 +61,45 @@ const AddNote = ({ navigation }) => {
     const fullTime = `${hora.slice(-2)}:${minuto.slice(-2)}`;
     return fullTime;
   };
+  // adicionar ou edita conteudo das notas
   const addNotes = async () =>{
-    let contNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
-    if (contNotes === null || Number.isNaN(contNotes)) {
-      contNotes = 1;
+    // adicionar
+    if(id === 0){
+      let contNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
+      if (contNotes === null || Number.isNaN(contNotes)) {
+        contNotes = 1;
+      }
+      const ins = {
+        id: contNotes,
+        name,
+        text: textTemp,
+        typeNote,
+        creationTime: getTime(),
+        creationDate: getDate(),
+        updateTime: '',
+        updateDate: '',
+      };
+      const notesObjTemp = JSON.parse(await AsyncStorage.getItem('notes')) || []; // pega os valores armazenados atualmente
+      notesObjTemp.push(ins); // insere novo registro
+      await AsyncStorage.setItem('notes', JSON.stringify(notesObjTemp)); // colocar o total + novo registro no asyncstorage
+      contNotes++; // aumenta contador de qtd de notas salvas
+      await AsyncStorage.setItem('contNotes', contNotes.toString());
     }
-    const ins = {
-      id: contNotes,
-      name,
-      text,
-      typeNote,
-      time: getTime(),
-      createdAt: getDate(),
-    };
-    const notesObjTemp = JSON.parse(await AsyncStorage.getItem('notes')) || []; // pega os valores armazenados atualmente
-    notesObjTemp.push(ins); // insere novo registro
-    await AsyncStorage.setItem('notes', JSON.stringify(notesObjTemp)); // colocar o total + novo registro no asyncstorage
-    contNotes++; // aumenta contador de qtd de notas salvas
-    await AsyncStorage.setItem('contNotes', contNotes.toString());
+    // editar
+    else{
+      let allNotes = JSON.parse(await AsyncStorage.getItem('notes'));
+      const contIdNotes = parseInt(await AsyncStorage.getItem('contNotes'), 10);
+      for (let i = 0; i < contIdNotes; i++) {           
+        if (allNotes[i].id === id) {
+          // setTextTemp(allNotes[i].text);
+          allNotes[i].text = textTemp;
+          allNotes[i].updateTime = getTime();
+          allNotes[i].updateDate = getDate();
+          break;
+        }
+      }
+      await AsyncStorage.setItem('notes', JSON.stringify(allNotes)); // atualiza nota editada a lista
+    }
   }
 
   return (
@@ -101,9 +113,8 @@ const AddNote = ({ navigation }) => {
           multiline
           numberOfLines={controlLines}
           placeholder="Insira suas anotações aqui :)"
-          // eslint-disable-next-line arrow-parens
           onChangeText={insertText => {
-            setText(insertText);
+            // setText(insertText);
             setTextTemp(insertText);
             if (parseInt(insertText.length * 0.06, 10) === controlLines) {
               setControlLines(controlLines + 1);
@@ -123,9 +134,10 @@ const AddNote = ({ navigation }) => {
         <PanelButton>
           <Button onPress={() => {
             addNotes();
+            const activity = textButton === 'EDITAR' ? 'editada' : 'adicionada';
             Alert.alert(
               '',
-              'Nova nota adicionada com sucesso!',
+              `Nota ${activity} com sucesso!`,
               [{text: 'OK', onPress: () => navigation.navigate('ViewNoteNavigator')}],
               {cancelable: false},
             );
